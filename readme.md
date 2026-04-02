@@ -1,13 +1,16 @@
-# Motion Dataset & Model
+# From YouTube to Motion Classifier — a practical MoCap tutorial
 
-The idea is simple: you can now extract human motion from a regular video, with no marker suit, no special camera, just a YouTube clip. This tutorial shows how to do that and build a gesture classifier on top.
+> Extract human motion from any video and classify gestures, with no marker suit and no special hardware.
+
+<!-- MoCap image coming soon -->
+
+Four notebooks take you from a YouTube search query to a trained gesture classifier.
+The example uses tennis strokes but you can adapt it to any sport or movement in a few minutes.
 
 ```
 YouTube videos  →  monocular MoCap  →  pose features  →  classifier
    (notebook 01)      (02 / 03)            (03)              (04)
 ```
-
-The example uses tennis (forehand vs backhand) but you can swap in any sport or movement.
 
 ---
 
@@ -40,12 +43,9 @@ Output is saved as `hmr4d_results.pt`, the same format as GVHMR, so you can swap
 
 ### 04 — Classification (`04_classification.ipynb`)
 
-Trains two models on the extracted poses:
-
-- **MLP** — takes a fixed feature vector per video (mean, std, min, max, range of each joint angle over time → 135 values)
-- **LSTM** — takes the full pose sequence directly (T × 27)
-
-Both trained with Adam for 60 epochs. The notebook plots learning curves and a confusion matrix at the end. There's also a `predict_gesture()` function you can call on any new video.
+Loads the SMPL files from notebook 03 and trains a Conv1D to distinguish gesture classes.
+Input is the `body_pose` sequence `(T, 69)` directly — no hand-crafted features.
+Outputs a learning curve and a confusion matrix.
 
 ---
 
