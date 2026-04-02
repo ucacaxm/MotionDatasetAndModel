@@ -1,4 +1,4 @@
-# From YouTube to Motion Classifier — a practical MoCap tutorial
+# From YouTube to Motion Classifier: a practical MoCap tutorial
 
 > Extract human motion from any video and classify gestures, with no marker suit and no special hardware.
 
