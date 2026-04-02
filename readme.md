@@ -49,7 +49,7 @@ Outputs a learning curve and a confusion matrix.
 
 ---
 
-## Setup
+## Install
 
 ```bash
 pip install yt-dlp mediapipe opencv-python-headless matplotlib scipy torch scikit-learn
