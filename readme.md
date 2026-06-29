@@ -1,75 +1,124 @@
-# From YouTube to Motion Classifier: a practical MoCap tutorial
+# Atelier GTAS - Reconnaissance de gestes de tennis
 
-> Extract human motion from any video and classify gestures, with no marker suit and no special hardware.
+L'idée est de partir d'une **vidéo de tennis** et d'en classifier le geste joué. On récupère le mouvement de la personne dans la vidéo, puis on entraîne un petit réseau de neurones (PyTorch) qui apprend à reconnaître le geste.
 
-<!-- MoCap image coming soon -->
+Il y a deux notebooks. Ils font la même chose, seule la façon de récupérer le mouvement change :
 
-Four notebooks take you from a YouTube search query to a trained gesture classifier.
-The example uses tennis strokes but you can adapt it to any sport or movement in a few minutes.
+- `GTAS_mediapipe.ipynb` - estimation avec **MediaPipe**.
+- `GTAS_GVHMR.ipynb` - estimation avec **GVHMR**.
 
-```
-YouTube videos  →  monocular MoCap  →  pose features  →  classifier
-   (notebook 01)      (02 / 03)            (03)              (04)
-```
+Les gestes reconnus (multi-label : plusieurs peuvent être actifs en même temps) sont `forehand`, `backhand`, `service` (et `smash` dans la version MediaPipe).
 
----
+> **C'est un atelier, il y a du code à compléter.** Le `MLPClassifier` est donné tout fait, mais le **`CNNClassifier` (CNN 1D), c'est à vous de l'écrire** - la cellule est un squelette avec des commentaires qui guident (encoding 1D → pooling masqué → MLP). Pareil pour les cellules « Classifions nos propres gestes » (capture webcam). Bref, il y a des cellules à trous.
 
-## Notebooks
+## MediaPipe ou GVHMR ?
 
-### 01 — Download videos (`01_download_videos.ipynb`)
-
-Uses yt-dlp to search YouTube and download videos automatically. You just give it a list of search queries, it handles the rest: filtering by duration, deduplication, downloading at 480p, saving a `metadata.json`.
-
-Change `SEARCH_QUERIES` at the top to match your movement of interest.
-
-### 02 — Visualisation (`02_mediapipe_pose.ipynb`)
-
-Just exploration: skeleton overlay on video frames, 3D joint trajectories, stride cycle detection from ankle height. Good to run first to check your videos are working and the pose extraction looks reasonable.
-
-### 03 — Pose → SMPL (`03_pose_to_smpl.ipynb`)
-
-This is version 1 of the MoCap step — no GPU needed.
-
-MediaPipe gives you 33 body landmarks per frame (positions in 3D). The notebook converts those into SMPL body parameters (joint rotations) by computing the angle between each bone's observed direction and its T-pose reference. It's a rough approximation but it works fine for classification.
-
-Output is saved as `hmr4d_results.pt`, the same format as GVHMR, so you can swap one for the other without touching the rest of the pipeline.
-
-| | MediaPipe (v1) | GVHMR (v2) |
+| | **MediaPipe** | **GVHMR** |
 |---|---|---|
-| GPU | no | yes (8+ GB) |
-| Install | `pip install mediapipe` | conda env |
-| Accuracy | approximate | much better |
-| Speed | real-time | ~2 fps |
+| Atout principal | Rapidité et simplicité | Qualité d'estimation (état de l'art) |
+| Vitesse | Rapide, temps réel possible | Plus lent (installation lourde, inférences coûteuses) |
+| Sortie | 33 points 3D (landmarks) | Paramètres SMPL (corps complet) |
+| Représentation pour le classifieur | Positions + vitesses | Rotations 6D + translation |
+| Usage en recherche | Pratique, léger | Paramètres SMPL largement utilisés en recherche |
+| Création de dataset | Convient aux cas simples | Permet de construire son propre dataset à partir de vidéos in-the-wild, grâce à sa robustesse |
 
-### 04 — Classification (`04_classification.ipynb`)
+## Pipeline commun
 
-Loads the SMPL files from notebook 03 and trains a Conv1D to distinguish gesture classes.
-Input is the `body_pose` sequence `(T, 69)` directly — no hand-crafted features.
-Outputs a learning curve and a confusion matrix.
+**Vidéo -> mouvement (MediaPipe ou GVHMR) -> features -> classifieur (MLP ou CNN) -> gestes prédits.**
 
----
+- Avec **MediaPipe** : le mouvement est une suite de 33 points 3D ; les features sont les positions recentrées/normalisées et leurs vitesses.
+- Avec **GVHMR** : le mouvement est une suite de paramètres SMPL ; les features sont les rotations converties en représentation 6D (orientation globale + pose des articulations) plus la translation.
 
-## Install
+<p align="center">
+  <img src="assets/img/blazeposeskel.png" alt="Squelette MediaPipe BlazePose (33 points)" height="260">
+  &nbsp;&nbsp;
+  <img src="assets/img/smpl.png" alt="Squelette SMPL (22 articulations)" height="260">
+</p>
+<p align="center"><em>À gauche : les 33 landmarks de MediaPipe (BlazePose). À droite : les 22 articulations du modèle SMPL utilisé par GVHMR.</em></p>
 
-```bash
-pip install yt-dlp mediapipe opencv-python-headless matplotlib scipy torch scikit-learn
-```
+## Démarrage rapide
 
-Then run the notebooks in order. Everything works on CPU, Google Colab is fine.
+1. Ouvrir le notebook choisi dans **Google Colab**.
+2. Activer un GPU via `Exécution > Modifier le type d'exécution > T4`.
+3. Exécuter les cellules dans l'ordre, de haut en bas. Un sommaire cliquable est placé en haut de chaque notebook, et un lien de retour vers le sommaire est fourni à chaque section.
 
----
+> Pour GVHMR, l'install (env conda + poids des modèles) est longue et lourde : ce sont les premières cellules qui s'en occupent, **n'y touchez pas**. Prévoyez une bonne connexion et un peu de patience (Le temps de prendre un café, ~10 min).
 
-## Changing the movement class
+## Ce que font les notebooks, étape par étape
 
-The main things to edit:
+| Étape | Description |
+|-------|-------------|
+| Installation & imports | Installer l'estimateur (MediaPipe ou GVHMR) et charger les bibliothèques |
+| 1. Test Video-to-Motion | Estimer le mouvement sur une vidéo d'exemple et afficher le rendu |
+| 2.1 Dataset | Charger les séquences de mouvement et leurs labels. |
+| 2.2 Features | Transformer chaque séquence en vecteurs par image (positions + vitesses pour MediaPipe, rotations 6D + translation pour GVHMR) |
+| 3.1 / 3.2 Modèles + Entraînement | Choisir un **MLP** (résumé statistique de la séquence) ou un **CNN 1D** (motifs temporels du mouvement (À coder)). Puis entraîner le modèle avec validation, à l'aide d'une perte multi-label pondérée |
+| 3.3 Résultats | Mesurer la précision par geste et tracer la matrice de confusion par combinaison de gestes |
+| 3.4 Inférence | Prédire les gestes sur un fichier |
+| 4. Tester ses propres gestes | Se filmer avec la webcam, puis faire prédire le geste |
 
-- `SEARCH_QUERIES` in notebook 01 (or `CLASSES` in notebook 04) — your YouTube search terms
-- `MAX_DURATION_SEC` — skip long videos
-- `SEQ_LEN` in notebook 04 — how many frames the LSTM sees
-- `SMPL_BONES` in notebooks 02/04 — which joints to track (useful if some are occluded a lot)
+## Les deux modèles
 
----
+Deux classifieurs au choix, interchangeables :
 
-## Version 2 — GVHMR
+- **MLP** - on résume la séquence par quelques stats (moyenne, écart-type, min, max) puis on classe. Simple et rapide, mais il ne voit pas l'ordre des frames.
 
-If you have a GPU, [GVHMR](https://github.com/zju3dv/GVHMR) (SIGGRAPH Asia 2024) gives much better pose estimates than the geometric approximation in notebook 02. It outputs the same `hmr4d_results.pt` format so you can plug it straight into notebook 04.
+<p align="center">
+  <img src="assets/img/MLP.jpg" alt="Schéma d'un perceptron multicouche (MLP)" width="480">
+</p>
+
+- **CNN 1D** - des convolutions 1D glissent le long du temps pour repérer les motifs du mouvement, bien plus adaptées à une séquence de poses. **C'est lui que vous codez pendant l'atelier** (la cellule `CNNClassifier` est un squelette à remplir).
+
+<p align="center">
+  <img src="assets/img/compressedconv.gif" alt="Animation d'une convolution 1D" width="480">
+</p>
+
+## Le dataset
+
+Le dataset fourni est déjà passé par l'inférence, vous n'avez rien à ré-inférer. Les fichiers `.npz` contiennent directement les mouvements (paramètres SMPL pour GVHMR, landmarks pour MediaPipe) + un `.csv` d'annotations. On les charge et on entraîne.
+
+GVHMR est assez robuste pour qu'on puisse se constituer un dataset à partir de vidéos in-the-wild : on passe chaque vidéo dans GVHMR pour récupérer les paramètres SMPL, puis on annote. C'est comme ça que le dataset maison du notebook GVHMR a été créé - et c'est aussi ce que vous pouvez faire pour ajouter vos propres données.
+
+La version MediaPipe, elle, s'appuie sur le dataset **THETIS** : des vidéos de gens jouant face caméra, dans un environnement contrôlé, sur lesquelles on a fait tourner MediaPipe.
+
+## Tester avec une vidéo
+
+Dans la dernière section de chaque notebook, deux options :
+- Se filmer en direct à la webcam, puis lancer la prédiction.
+- Charger un fichier existant et le tester (une vidéo, ou un fichier de mouvement déjà produit).
+
+## Références
+
+À titre indicatif, voici les pipelines d'inférence video-to-motion utilisées par chaque estimateur :
+
+<p align="center">
+  <img src="assets/img/mediapipe.png" alt="Pipeline d'inférence MediaPipe" width="100%">
+</p>
+<p align="center"><em>Pipeline MediaPipe (estimation des 33 landmarks).</em></p>
+
+<p align="center">
+  <img src="assets/img/GVHMR.png" alt="Pipeline d'inférence GVHMR" width="100%">
+</p>
+<p align="center"><em>Pipeline GVHMR (récupération des paramètres SMPL).</em></p>
+
+**MediaPipe**
+
+- Lugaresi, C., Tang, J., Nash, H., McClanahan, C., Uboweja, E., Hays, M., Zhang, F., Chang, C.-L., Yong, M., Lee, J., Chang, W.-T., Hua, W., Georg, M., & Grundmann, M. (2019). MediaPipe: A Framework for Perceiving and Processing Reality. *Third Workshop on Computer Vision for AR/VR at IEEE Computer Vision and Pattern Recognition (CVPR) 2019*.
+
+**GVHMR**
+
+- Shen, Z.\*, Pi, H.\*, Xia, Y., Cen, Z., Peng, S.†, Hu, Z., Bao, H., Hu, R., & Zhou, X. (2024). World-Grounded Human Motion Recovery via Gravity-View Coordinates. *SIGGRAPH Asia 2024*.
+
+**SMPL (modèle de corps utilisé par GVHMR)**
+- Loper, Matthew and Mahmood, Naureen and Romero, Javier and Pons-Moll, Gerard and Black, Michael J.
+*SIGGRAPH Asia 2015*
+
+**Représentation 6D des rotations (utilisée par GVHMR)**
+
+- Zhou, Y., Barnes, C., Lu, J., Yang, J., & Li, H. (2019). On the Continuity of Rotation Representations in Neural Networks. *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*. arXiv:1812.07035 - https://arxiv.org/abs/1812.07035
+
+**THETIS dataset (utilisé par la version MediaPipe)**
+
+- Gourgari, S., Goudelis, G., Karpouzis, K., & Kollias, S. (2013). Thetis: Three-dimensional tennis shots a human action dataset. In *Proceedings of the IEEE conference on computer vision and pattern recognition workshops* (pp. 676-681).
+- Goudelis, G., Tsatiris, G., Karpouzis, K., & Kollias, S. (2017, August). 3D Cylindrical Trace Transform based feature extraction for effective human action classification. In *2017 IEEE Conference on Computational Intelligence and Games (CIG)* (pp. 96-103). IEEE.
+- Varia, C., Tsatiris, G., Karpouzis, K., & Kollias, S. (2018, August). A refined 3d dataset for the analysis of player actions in exertion games. In *2018 IEEE Conference on Computational Intelligence and Games (CIG)* (pp. 1-4). IEEE.
