@@ -7,6 +7,11 @@ Il y a deux notebooks. Ils font la même chose, seule la façon de récupérer l
 - `GTAS_mediapipe.ipynb` - estimation avec **MediaPipe**.
 - `GTAS_GVHMR.ipynb` - estimation avec **GVHMR**.
 
+Accès aux Colab :
+
+- MediaPipe : [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ucacaxm/MotionDatasetAndModel/blob/main/src/GTAS_mediapipe.ipynb)
+- GVHMR : [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ucacaxm/MotionDatasetAndModel/blob/main/src/GTAS_GVHMR.ipynb)
+
 Les gestes reconnus (multi-label : plusieurs peuvent être actifs en même temps) sont `forehand`, `backhand`, `service` (et `smash` dans la version MediaPipe).
 
 > **C'est un atelier, il y a du code à compléter.** Le `MLPClassifier` est donné tout fait, mais le **`CNNClassifier` (CNN 1D), c'est à vous de l'écrire** - la cellule est un squelette avec des commentaires qui guident (encoding 1D → pooling masqué → MLP). Pareil pour les cellules « Classifions nos propres gestes » (capture webcam). Bref, il y a des cellules à trous.
@@ -34,7 +39,7 @@ Les gestes reconnus (multi-label : plusieurs peuvent être actifs en même temps
   &nbsp;&nbsp;
   <img src="assets/img/smpl.png" alt="Squelette SMPL (22 articulations)" height="260">
 </p>
-<p align="center"><em>À gauche : les 33 landmarks de MediaPipe (BlazePose). À droite : les 22 articulations du modèle SMPL utilisé par GVHMR.</em></p>
+<p align="center"><em>Au dessus : les 33 landmarks de MediaPipe (BlazePose). En dessous : les 22 articulations du modèle SMPL utilisé par GVHMR.</em></p>
 
 ## Démarrage rapide
 
@@ -76,6 +81,11 @@ Deux classifieurs au choix, interchangeables :
 ## Le dataset
 
 Le dataset fourni est déjà passé par l'inférence, vous n'avez rien à ré-inférer. Les fichiers `.npz` contiennent directement les mouvements (paramètres SMPL pour GVHMR, landmarks pour MediaPipe) + un `.csv` d'annotations. On les charge et on entraîne.
+
+Les notebooks le téléchargent automatiquement depuis Google Drive, mais voici les liens directs :
+
+- Dataset MediaPipe (landmarks) : https://drive.google.com/file/d/14985toxIs_pWDkwZbV1rWXgQYW8olmzg/view?usp=sharing
+- Dataset GVHMR (SMPL) : https://drive.google.com/file/d/1PUjJyJZ3q9_XfXvUNBYThF0URT05rpEG/view?usp=sharing
 
 GVHMR est assez robuste pour qu'on puisse se constituer un dataset à partir de vidéos in-the-wild : on passe chaque vidéo dans GVHMR pour récupérer les paramètres SMPL, puis on annote. C'est comme ça que le dataset maison du notebook GVHMR a été créé - et c'est aussi ce que vous pouvez faire pour ajouter vos propres données.
 
