@@ -91,7 +91,7 @@ GVHMR est assez robuste pour qu'on puisse se constituer un dataset à partir de 
 
 La version MediaPipe, elle, s'appuie sur le dataset **THETIS** : des vidéos de gens jouant face caméra, dans un environnement contrôlé, sur lesquelles on a fait tourner MediaPipe.
 
-## Tester avec une vidéo
+## Démo avec une vidéo
 
 Dans la dernière section de chaque notebook, deux options :
 - Se filmer en direct à la webcam, puis lancer la prédiction.
@@ -113,22 +113,26 @@ Dans la dernière section de chaque notebook, deux options :
 
 **MediaPipe**
 
-- Lugaresi, C., Tang, J., Nash, H., McClanahan, C., Uboweja, E., Hays, M., Zhang, F., Chang, C.-L., Yong, M., Lee, J., Chang, W.-T., Hua, W., Georg, M., & Grundmann, M. (2019). MediaPipe: A Framework for Perceiving and Processing Reality. *Third Workshop on Computer Vision for AR/VR at IEEE Computer Vision and Pattern Recognition (CVPR) 2019*.
+- Lugaresi C., Tang J., Nash H., McClanahan C., Uboweja E., Hays M., Zhang F., Chang C.-L., Yong M., Lee J., Chang W.-T., Hua W., Georg M., & Grundmann M. (2019). **MediaPipe: A Framework for Perceiving and Processing Reality**. *Third Workshop on Computer Vision for AR/VR at IEEE Computer Vision and Pattern Recognition (CVPR) 2019*.
 
 **GVHMR**
 
-- Shen, Z.\*, Pi, H.\*, Xia, Y., Cen, Z., Peng, S.†, Hu, Z., Bao, H., Hu, R., & Zhou, X. (2024). World-Grounded Human Motion Recovery via Gravity-View Coordinates. *SIGGRAPH Asia 2024*.
+- Shen Z.\*, Pi H.\*, Xia Y., Cen Z., Peng S.†, Hu Z., Bao H., Hu R., & Zhou X. (2024). **World-Grounded Human Motion Recovery via Gravity-View Coordinates**. *SIGGRAPH Asia 2024*.
 
 **SMPL (modèle de corps utilisé par GVHMR)**
-- Loper, Matthew and Mahmood, Naureen and Romero, Javier and Pons-Moll, Gerard and Black, Michael J.
+- Loper, Matthew and Mahmood, Naureen and Romero, Javier and Pons-Moll, Gerard and Black, Michael J.**SMPL: A Skinned Multi-Person Linear Model**.
 *SIGGRAPH Asia 2015*
 
 **Représentation 6D des rotations (utilisée par GVHMR)**
 
-- Zhou, Y., Barnes, C., Lu, J., Yang, J., & Li, H. (2019). On the Continuity of Rotation Representations in Neural Networks. *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*. arXiv:1812.07035 - https://arxiv.org/abs/1812.07035
+- Zhou Y., Barnes C., Lu J., Yang, J., & Li H. (2019). **On the Continuity of Rotation Representations in Neural Networks**. *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*. arXiv:1812.07035 - https://arxiv.org/abs/1812.07035
 
 **THETIS dataset (utilisé par la version MediaPipe)**
 
-- Gourgari, S., Goudelis, G., Karpouzis, K., & Kollias, S. (2013). Thetis: Three-dimensional tennis shots a human action dataset. In *Proceedings of the IEEE conference on computer vision and pattern recognition workshops* (pp. 676-681).
-- Goudelis, G., Tsatiris, G., Karpouzis, K., & Kollias, S. (2017, August). 3D Cylindrical Trace Transform based feature extraction for effective human action classification. In *2017 IEEE Conference on Computational Intelligence and Games (CIG)* (pp. 96-103). IEEE.
-- Varia, C., Tsatiris, G., Karpouzis, K., & Kollias, S. (2018, August). A refined 3d dataset for the analysis of player actions in exertion games. In *2018 IEEE Conference on Computational Intelligence and Games (CIG)* (pp. 1-4). IEEE.
+- Gourgari, S., Goudelis, G., Karpouzis, K., & Kollias, S. (2013). **Thetis: Three-dimensional tennis shots a human action dataset**. *Proceedings of the IEEE conference on computer vision and pattern recognition workshops* (pp. 676-681).
+- Goudelis, G., Tsatiris, G., Karpouzis, K., & Kollias, S. (2017, August). **3D Cylindrical Trace Transform based feature extraction for effective human action classification**. *2017 IEEE Conference on Computational Intelligence and Games (CIG)* (pp. 96-103). IEEE.
+- Varia, C., Tsatiris, G., Karpouzis, K., & Kollias, S. (2018, August). **A refined 3d dataset for the analysis of player actions in exertion games**. *2018 IEEE Conference on Computational Intelligence and Games (CIG)* (pp. 1-4). IEEE.
+
+**Pipeline utilsée pour récolter le dataset issu de YouTube (utilisé par la version GVHMR)**
+
+- SALAZAR, N., Dellandréa E., Lefort M., & Meyer A., (2026). **XmoPipe: A Pipeline for Large-Scale In-the-Wild Human Motion Dataset Construction**. *International Conference on Computer Animation, Social Agents, and Extended Reality CASAXR 26*.
